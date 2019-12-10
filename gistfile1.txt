@@ -1,0 +1,452 @@
+// IMA NYU Shanghai
+// Interaction Lab
+// For receiving multiple values from Arduino to Processing
+
+/*
+ * Based on the readStringUntil() example by Tom Igoe
+ * https://processing.org/reference/libraries/serial/Serial_readStringUntil_.html
+ */
+
+import processing.serial.*;
+
+import processing.video.*; 
+Capture cam;
+
+Movie AsianMov, NativeAmericanMov, HispanicMov, WhiteMov, AfricanMov;
+
+import processing.sound.*;
+SoundFile sound;
+
+
+String myString = null;
+Serial myPort;
+int valueFromArduino;
+int count = 0;
+
+int val, val2;//, //val3;
+int button, button2;
+
+int NUM_OF_VALUES = 2;   /** YOU MUST CHANGE THIS ACCORDING TO YOUR PROJECT **/
+int[] sensorValues;      /** this array stores values from Arduino **/
+int pageNumber = 1;
+
+long drawStart = 0;
+
+PFont font, font1;
+PImage img;
+
+
+void setup() {
+  //fullScreen();
+  size(1440, 800);
+  background(255);
+  colorMode(HSB);
+  loadFont("Times-Roman-48.vlw");
+  sound = new SoundFile(this, "camera-shutter-click-01.mp3");
+
+  cam = new Capture(this, 1440, 800);
+  cam.start(); 
+
+  AsianMov =  new Movie (this, "AsianClip.mp4");
+  NativeAmericanMov = new Movie(this, "NativeAClip.mp4");
+  HispanicMov = new Movie (this, "HispanicClip.mp4");
+  WhiteMov = new Movie (this, "WhiteClip.mp4");
+  AfricanMov = new Movie (this, "BlacksClip.mp4");
+
+
+  setupSerial();
+}
+
+void draw() {
+  updateSerial();
+  //printArray(sensorValues);
+  println(sensorValues[1]);
+
+
+  //if (cam.available()) { 
+  //  cam.read(); 
+  //  image(cam, 0, 0); 
+  //} 
+
+  //cam.loadPixels();
+
+  val = sensorValues[1];  // read it and store it in val
+  val2 = sensorValues[0];
+
+  font1 = loadFont("Times-Roman-48.vlw");
+
+  if (val == 1 && button == 0) {
+    pageNumber ++;
+  }
+
+  if (pageNumber == 1) {
+    clear();
+    textFont(font1, 50);
+    text("For college application purposes, fill in your demographics.", 200, 200, 500, 600);
+    textFont(font1, 25);
+    text("(Press black button on camera to continue)", 600, 600, 500, 400);
+  } else if (pageNumber == 2) {
+    clear();
+    textFont(font1, 50);
+    text("Please indicate how you identify yourself. (Select one)", 100, 100, 600, 500);
+    text("A. American Indian or Alaska Native", 100, 300);
+    text("B. Asian", 100, 400);
+    text("C. Black or African American", 100, 500);
+    text("D. Hispanic or Latino", 100, 600);
+    text("E. White (Middle Eastern)", 100, 700);
+  } else if (pageNumber == 3) {
+
+    if (cam.available()) { 
+      cam.read(); 
+      image(cam, 0, 0);
+      fill(0);
+      textFont(font1, 40);
+      text("Use the yellow button on the camera to take a picture for your future college photo ID", 40, 50);
+    }
+    cam.loadPixels();
+    // noStroke();
+  }
+
+  if (val2 == 1 && button2==0 ) {
+    sound.play();  
+    cam.save("data/" + count+".jpg");
+    count++;
+    pageNumber = 4;
+  } 
+  if (pageNumber == 4) {
+    background(255);
+    textFont(font1, 50);
+    text("Processing image based on race...", 200, 200, 500, 600);
+    textFont(font1, 25);
+    text("(Press black button to reveal image)", 600, 600, 500, 400);
+    drawStart = millis();
+  }
+
+  if (pageNumber == 5) {
+    PImage img = loadImage(count-1+".jpg");
+    for (int i=0; i<100; i++) {
+      int size = int( random(5, 40) );
+      int x = int( random(img.width) );
+      int y = int( random(img.height) );
+      // get the pixel color
+      color c = img.get(x, y);
+      // val3 = 1;
+
+      if (key == 'a') {
+        font = loadFont("AvenirNext-Bold-48.vlw");
+        textFont(font, size);
+        fill(c);
+        if (x % 5 == 0) {
+          text("Feather Head", x, y);
+        } else  if (x % 5 == 1) {
+          text("Red Skin", x, y);
+        } else if (x % 5 == 2) {
+          text("Pocahontas", x, y);
+        } else if (x % 5 == 3) {
+          text ("Lowlives", x, y);
+        } else if (x % 5 == 4) {
+          text ("Alcoholic", x, y);
+        }
+        //image(loadImage(count-1+".jpg"), 0,0);
+        if (millis() - drawStart > 8000) {
+          NativeAmericanMov.play();
+          pageNumber =6;
+        }
+      }
+
+      if (key == 'b') {
+        font = loadFont("AvenirNext-Bold-48.vlw");
+        textFont(font, size);
+        fill(c);
+        if (x % 5 == 0) {
+          text("Nerd", x, y);
+        } else  if (x % 5 == 1) {
+          text("Rice Addict", x, y);
+        } else if (x % 5 == 2) {
+          text("Dog Eater", x, y);
+        } else if (x % 5 == 3) {
+          text ("Good at math", x, y);
+        } else if (x % 5 == 4) {
+          text ("Small Eyes", x, y);
+        }
+        //image(loadImage(count-1+".jpg"), 0,0);
+        if (millis() - drawStart > 8000) {
+          AsianMov.play();
+          pageNumber =6;
+        }
+      }
+
+      if (key == 'c') {
+        font = loadFont("AvenirNext-Bold-48.vlw");
+        textFont(font, size);
+        fill(c);
+        if (x % 5 == 0) {
+          text("Uneducated Slave", x, y);
+        } else  if (x % 5 == 1) {
+          text("Monkeys", x, y);
+        } else  if (x % 5 == 2) {
+          text("Gorillas", x, y);
+        } else  if (x % 5 == 3) {
+          text("Rapist", x, y);
+        } else  if (x % 5 == 4) {
+          text("Poor", x, y);
+        }          //image(loadImage(count-1+".jpg"), 0,0);
+        if (millis() - drawStart > 8000) {
+          AfricanMov.play();
+          pageNumber =6;
+        }
+      }
+
+      if (key == 'd') {
+        font = loadFont("AvenirNext-Bold-48.vlw");
+        textFont(font, size);
+        fill(c);
+        if (x % 7 == 0) {
+          text("Mexican immigrant", x, y);
+        } else  if (x % 7 == 1) {
+          text("Lazy", x, y);
+        } else  if (x % 7 == 2) {
+          text("Poor", x, y);
+        } else  if (x % 7 == 3) {
+          text("Violent", x, y);
+        } else  if (x % 7 == 4) {
+          text("Temperamental", x, y);
+        } else  if (x % 7 == 5) {
+          text("Dirty", x, y);
+        } else  if (x % 7 == 6) {
+          text("Drug Dealers", x, y);
+        }
+        //image(loadImage(count-1+".jpg"), 0,0);
+        if (millis() - drawStart > 8000) {
+          HispanicMov.play();
+          pageNumber =6;
+        }
+      }
+
+      if (key == 'e') {
+        font = loadFont("AvenirNext-Bold-48.vlw");
+        textFont(font, size);
+        fill(c);
+        if (x % 7 == 0) {
+          text("Racist", x, y);
+        } else  if (x % 7 == 1) {
+          text("European Colonizer", x, y);
+        } else  if (x % 7 == 2) {
+          text("Entitled", x, y);
+        } else  if (x % 7 == 3) {
+          text("Priviledged", x, y);
+        } else  if (x % 7 == 4) {
+          text("Snobby", x, y);
+        } else  if (x % 7 == 5) {
+          text("White Supremacist", x, y);
+        } else  if (x % 7 == 6) {
+          text("Rich", x, y);
+        }
+
+        //image(loadImage(count-1+".jpg"), 0,0);
+        if (millis() - drawStart > 8000) {
+          WhiteMov.play();
+          pageNumber =6;
+        }
+      }
+    }
+  }
+
+  if (pageNumber == 6) {
+    if (AsianMov.available()) {
+      AsianMov.read();
+    }
+    image(AsianMov, 0, 0, width, height);
+    if (AsianMov.time() > 34) {
+      pageNumber = 7;
+      AsianMov.stop();
+      drawStart = millis();
+    }
+
+    if (NativeAmericanMov.available()) {
+      NativeAmericanMov.read();
+    }
+    image(NativeAmericanMov, 0, 0, width, height);
+    if (NativeAmericanMov.time() > 25) {
+      pageNumber = 7;
+      NativeAmericanMov.stop();
+      drawStart = millis();
+    }
+
+    if (AfricanMov.available()) {
+      AfricanMov.read();
+    }
+    image(AfricanMov, 0, 0, width, height);
+    if (AfricanMov.time() > 33) {
+      pageNumber = 7;
+      AfricanMov.stop();
+      drawStart = millis();
+    }
+
+    if (WhiteMov.available()) {
+      WhiteMov.read();
+    }
+    image(WhiteMov, 0, 0, width, height);
+    if (WhiteMov.time() > 43) {
+      pageNumber = 7;
+      WhiteMov.stop();
+      drawStart = millis();
+    }
+
+    if (HispanicMov.available()) {
+      HispanicMov.read();
+    }
+    image(HispanicMov, 0, 0, width, height);
+    if (HispanicMov.time() > 29) {
+      pageNumber = 7;
+      HispanicMov.stop();
+      drawStart = millis();
+    }
+  }
+
+  if (pageNumber ==  7) {
+    if (key == 'a') { 
+      clear();
+      fill(255);
+      textFont(font1, 50);  
+      text("Congratulations!", 200, 200, 500, 600);
+      textFont(font1, 35); 
+      text("You have been been admitted because your race represents 5% of American population!", 200, 300, 500, 600);
+      fill(167);
+      textFont(font1, 25);
+      text("Now, how will you stay safe in a non-indigenous world?", 800, 600);
+    }
+    if (key == 'b') { 
+      clear();
+      fill(255);
+      textFont(font1, 50);  
+      text("Congratulations!",200,200,500,600);
+      textFont(font1,35);
+      text("You have been accepted based on your highly impressive Mathematical skills! ", 200, 300, 500, 600);
+      fill(167);
+      textFont(font1, 25);
+      text("Now, how will you leave your “Nerdy”  asian identity aside by shifting to Western personality traits and names?", 200, 600);
+    }
+
+    if (key == 'c') { 
+      clear();
+      fill(255);
+      textFont(font1, 50);  
+      text("Congratulations!",200,200,500,600);
+      textFont(font1,35);
+      text("You have been accepted because America is not racist!", 200, 300, 500, 600);
+      fill(167);
+      textFont(font1, 25);
+      text("Now, how will make others feel safe around you to prevent getting aggravated by a police?", 400, 600);
+    }
+
+    if (key == 'd') { 
+      clear();
+      fill(255);
+      textFont(font1, 50);  
+      text("Congratulations!",200,200,500,600);
+      textFont(font1,35);
+      text("You have been admitted thanks to your minority group! ", 200, 300, 500, 600);
+      fill(167);
+      textFont(font1, 25);
+      text("Now, how will you pay if you are poor, will your mom sell tacos or clean the floors?", 400, 600);
+    } 
+
+    if (key == 'e') { 
+      clear();
+      fill(255);
+      textFont(font1, 50);  
+      text("Congratulations!",200,200,500,600);
+      textFont(font1,35);
+      text("You have been admitted because your race is privileged!", 200, 300, 500, 600);
+      fill(167);
+      textFont(font1, 25);
+      text("Now, how will you ensure others don’t see you as racist and think you bribed your way into the school?", 300, 600);
+    }
+    if (millis() - drawStart > 10000) {
+      pageNumber = 8;
+    }
+  }
+
+  if (pageNumber == 8) {
+    clear();
+    fill(255);
+    textFont(font1, 50);  
+    text("Regardless of who's asking,", 200, 200, 500, 400);
+    text("don't let the labels surrounding your race, distort your identity.", 250, 350, 500, 600);
+  }
+
+  button = sensorValues[1];
+  button2 = sensorValues[0];
+}
+
+// if (val == 1 && button==0 )
+
+void keyPressed() {
+  if (key == 'a') { 
+    ellipse(105, 195, 20, 20);
+    pageNumber = 3;
+    noStroke();
+  }
+
+  if (key == 'b') {
+    ellipse(105, 245, 20, 20);
+    pageNumber = 3;
+    noStroke();
+  }
+
+  if (key == 'c') { 
+    ellipse(105, 295, 20, 20);
+    pageNumber = 3;
+    noStroke();
+  }
+
+  if (key == 'd') {
+    ellipse(105, 345, 20, 20);
+    pageNumber = 3;
+    noStroke();
+  }
+
+  if (key == 'e') {
+    ellipse(105, 395, 20, 20);
+    pageNumber = 3;
+    noStroke();
+  }
+}
+
+
+
+void setupSerial() {
+  printArray(Serial.list());
+  myPort = new Serial(this, Serial.list()[ 4 ], 9600);
+  // WARNING!
+  // You will definitely get an error here.
+  // Change the PORT_INDEX to 0 and try running it again.
+  // And then, check the list of the ports,
+  // find the port "/dev/cu.usbmodem----" or "/dev/tty.usbmodem----" 
+  // and replace PORT_INDEX above with the index number of the port.
+
+  myPort.clear();
+  // Throw out the first reading,
+  // in case we started reading in the middle of a string from the sender.
+  myString = myPort.readStringUntil( 10 );  // 10 = '\n'  Linefeed in ASCII
+  myString = null;
+
+  sensorValues = new int[NUM_OF_VALUES];
+}
+
+
+
+void updateSerial() {
+  while (myPort.available() > 0) {
+    myString = myPort.readStringUntil( 10 ); // 10 = '\n'  Linefeed in ASCII
+    if (myString != null) {
+      String[] serialInArray = split(trim(myString), ",");
+      if (serialInArray.length == NUM_OF_VALUES) {
+        for (int i=0; i<serialInArray.length; i++) {
+          sensorValues[i] = int(serialInArray[i]);
+        }
+      }
+    }
+  }
+}
