@@ -44,10 +44,10 @@ void setup() {
   loadFont("Times-Roman-48.vlw");
   sound = new SoundFile(this, "camera-shutter-click-01.mp3");
 
-  cam = new Capture(this, 1440, 800);
+  cam = new Capture(this, 1440,  800);
   cam.start(); 
 
-  AsianMov =  new Movie (this, "AsianClip.mp4");
+  AsianMov =  new Movie (this, "Asian.mp4");
   NativeAmericanMov = new Movie(this, "NativeAClip.mp4");
   HispanicMov = new Movie (this, "HispanicClip.mp4");
   WhiteMov = new Movie (this, "WhiteClip.mp4");
@@ -325,7 +325,7 @@ void draw() {
       text("You have been accepted based on your highly impressive Mathematical skills! ", 200, 300, 500, 600);
       fill(167);
       textFont(font1, 25);
-      text("Now, how will you leave your “Nerdy”  asian identity aside by shifting to Western personality traits and names?", 200, 600);
+      text("Now, how will you leave your “Nerd” asian identity aside by shifting to Western personality traits and names?", 200, 600);
     }
 
     if (key == 'c') { 
@@ -363,7 +363,7 @@ void draw() {
       textFont(font1, 25);
       text("Now, how will you ensure others don’t see you as racist and think you bribed your way into the school?", 300, 600);
     }
-    if (millis() - drawStart > 10000) {
+    if (millis() - drawStart > 8000) {
       pageNumber = 8;
     }
   }
