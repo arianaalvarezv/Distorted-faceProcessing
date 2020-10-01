@@ -1,0 +1,54 @@
+// IMA NYU Shanghai
+// Interaction Lab
+// For sending multiple values from Arduino to Processing
+
+const int buttonPin = 2;
+const int button = 4;
+int sensor1 = 0;
+int sensor2 = 0;
+//int ledPin = 13;
+
+void setup() {
+  pinMode(button, INPUT);
+  pinMode(buttonPin, INPUT);
+  //  pinMode(ledPin,OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  int sensor1 = digitalRead(button);
+  //  int sensor1 = analogRead(A0);
+  //  sensor1 = map(sensor1,0,1023,0,255);
+
+  int sensor2 = digitalRead(buttonPin);
+  //  sensor2 = map(sensor2,0,1023,0,255);
+
+  //int sensor3 = digitalRead(ledPin);
+
+  // keep this format
+  Serial.print(sensor1);
+  Serial.print(",");  // put comma between sensor values
+  Serial.print(sensor2);
+  Serial.println();
+  //  Serial.println(); // add linefeed after sending the last sensor value
+  //  Serial.print(sensor3);
+
+
+  //  digitalWrite(ledPin,HIGH);
+  //  delay(100);
+  //  digitalWrite(ledPin,LOW);
+  //  delay(100);
+
+  //if (digitalRead(buttonPin) == HIGH) {  // If switch is ON,
+  //    Serial.write(1);               // send 1 to Processing
+  //  } else {                               // If the switch is not ON,
+  //    Serial.write(0);               // send 0 to Processing
+  //  }
+
+
+  // too fast communication might cause some latency in Processing
+  // this delay resolves the issue.
+
+  delay(100);
+
+}
